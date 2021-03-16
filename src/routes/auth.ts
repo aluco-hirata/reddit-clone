@@ -1,10 +1,10 @@
 import { Request, Response, Router } from 'express';
-import { User } from '../entities/User';
 import { validate, isEmpty } from 'class-validator';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import cookie from 'cookie';
 
+import User from '../entities/User';
 import auth from '../middleware/auth'
 
 
@@ -60,7 +60,7 @@ const login = async (req: Request, res: Response) => {
 			return res.status(401).json({ password: 'パスワードが正しくありません' });
 		}
 
-		const token = jwt.sign({ username }, process.env.JWT_SECRET);
+		const token = jwt.sign({ username }, process.env.JWT_SECRET!);
 
 		res.set(
 			'Set-Cookie',
@@ -73,7 +73,10 @@ const login = async (req: Request, res: Response) => {
 			}),
 		);
 		return res.json(user);
-	} catch (error) {}
+  } catch (error) {
+    console.log(error);
+    return res.json({error: "異常が発生しました"})
+  }
 };
 
 const me = (_: Request, res: Response) => {

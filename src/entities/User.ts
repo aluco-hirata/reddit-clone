@@ -1,27 +1,23 @@
-import { IsEmail, Length, Min } from 'class-validator';
+import { IsEmail, Length } from 'class-validator';
 import {
-	Entity,
-	PrimaryGeneratedColumn,
+	Entity as TOEntity ,
 	Column,
-	BaseEntity,
 	Index,
-	CreateDateColumn,
-	UpdateDateColumn,
 	BeforeInsert,
+  OneToMany,
 } from 'typeorm';
 import bcrypt from 'bcrypt';
-import { classToPlain, Exclude } from 'class-transformer';
+import {  Exclude } from 'class-transformer';
 
-@Entity('users')
-export class User extends BaseEntity {
+import Entity from "./Entity"
+import { Post } from './Post';
+
+@TOEntity('users')
+export default class User extends Entity {
 	constructor(user: Partial<User>) {
 		super();
 		Object.assign(this, user);
 	}
-
-	@Exclude()
-	@PrimaryGeneratedColumn()
-	id: number;
 
 	@Index()
 	@IsEmail()
@@ -36,20 +32,14 @@ export class User extends BaseEntity {
 	@Exclude()
 	@Column()
 	@Length(6, 255, { message: 'パスワードは6文字以上必要です' })
-	password: string;
-
-	@CreateDateColumn()
-	createdAt: Date;
-
-	@UpdateDateColumn()
-	updatedAt: Date;
+  password: string;
+  
+  @OneToMany(() => Post, post => post.user)
+  posts: Post[];
 
 	@BeforeInsert()
 	async hashPassword() {
 		this.password = await bcrypt.hash(this.password, 6);
 	}
 
-	toJSON() {
-		return classToPlain(this);
-	}
 }
