@@ -5,8 +5,14 @@ import jwt from 'jsonwebtoken';
 import cookie from 'cookie';
 
 import User from '../entities/User';
-import auth from '../middleware/auth'
+import auth from '../middleware/auth';
 
+const mapErrors = (errors: Object[]) => {
+  return errors.reduce((prev: any, err: any) => {
+    prev[err.property] = Object.entries(err.constraints)[0][1]
+    return prev
+  }, {})
+};
 
 const register = async (req: Request, res: Response) => {
 	const { email, username, password } = req.body;
@@ -28,7 +34,7 @@ const register = async (req: Request, res: Response) => {
 
 		errors = await validate(user);
 		if (errors.length > 0) {
-			return res.status(400).json(errors);
+			return res.status(400).json(mapErrors(errors));
 		}
 		await user.save();
 
@@ -53,7 +59,7 @@ const login = async (req: Request, res: Response) => {
 		}
 
 		const user = await User.findOne({ username });
-		if (!user) return res.status(404).json({ error: 'ユーザーが見つかりません' });
+		if (!user) return res.status(404).json({ username: 'ユーザーが見つかりません' });
 
 		const passwordMatches = await bcrypt.compare(password, user.password);
 		if (!passwordMatches) {
@@ -73,14 +79,14 @@ const login = async (req: Request, res: Response) => {
 			}),
 		);
 		return res.json(user);
-  } catch (error) {
-    console.log(error);
-    return res.json({error: "異常が発生しました"})
-  }
+	} catch (error) {
+		console.log(error);
+		return res.json({ error: '異常が発生しました' });
+	}
 };
 
 const me = (_: Request, res: Response) => {
-	return res.json(res.locals.user)
+	return res.json(res.locals.user);
 };
 
 const logout = (_: Request, res: Response) => {

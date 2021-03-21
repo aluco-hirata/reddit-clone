@@ -20,7 +20,8 @@ export default class User extends Entity {
 	}
 
 	@Index()
-	@IsEmail()
+  @IsEmail(undefined, { message: '有効なEmailを入力してください' })
+	@Length(1, 255, { message: 'Emailが空です' })
 	@Column({ unique: true })
 	email: string;
 
