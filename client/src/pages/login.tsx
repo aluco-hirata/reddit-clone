@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/dist/client/router';
 import { FormEvent, useState } from 'react';
 import Axios from 'axios';
-import InputGroup from '../src/components/InputGroup';
+import InputGroup from '../components/InputGroup';
 
 const Register = () => {
 	const [username, setUsername] = useState('');
@@ -28,7 +28,7 @@ const Register = () => {
 	};
 
 	return (
-		<div className="flex">
+		<div className="flex bg-white">
 			<Head>
 				<title>Login</title>
 			</Head>
